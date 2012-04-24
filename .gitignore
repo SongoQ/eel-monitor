@@ -2,5 +2,6 @@ vendor
 phpunit.xml
 eel-monitor.phar
 eel-monitor.yml
+web
 
 composer.lock
