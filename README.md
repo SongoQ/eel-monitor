@@ -16,4 +16,4 @@ Marcin Chyłek - <marcin@chylek.pl>
 License
 -------
 
-Ell Monitor is licensed under the MIT License - see the LICENSE file for details
+Eel Monitor is licensed under the MIT License - see the LICENSE file for details
