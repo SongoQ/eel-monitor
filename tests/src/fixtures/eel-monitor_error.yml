@@ -1,0 +1,9 @@
+# Config
+---
+service:
+  
+ example_1:
+    type:   url
+   url:    http://google.com/
+    status: 200
+    
