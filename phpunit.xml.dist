@@ -13,7 +13,7 @@
 >
     <testsuites>
         <testsuite name="Eel-Monitor Test Suite">
-            <directory>./tests/EelMonitor/</directory>
+            <directory>./tests/src/EelMonitor/</directory>
         </testsuite>
     </testsuites>
 
