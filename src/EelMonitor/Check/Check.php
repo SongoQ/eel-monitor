@@ -13,6 +13,7 @@ namespace EelMonitor\Check;
 
 use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Exception\ParseException;
+use Symfony\Component\HttpFoundation\Response;
 use EelMonitor\Check\CheckException;
 
 class Check
@@ -45,18 +46,26 @@ class Check
     private function executeStatus($services)
     {
         foreach ($services as $key => $service) {
-
-            if ($this->responseType == Check::RESPONSE_STATUS) {
-
-                $info = $this->checkService($key, $service);
-
-                if (!$info->getStatus()) {
-                    return $info->getErrorMessage();
+            $info = $this->checkService($key, $service);
+            
+            if (!$info->getStatus()) {
+                if ('cli' === PHP_SAPI) {
+                    throw new \Exception($info->getErrorMessage());
+                } else {
+                    $response = new Response($info->getErrorMessage(), 500, array('content-type' => 'text/html'));
+                    $response->send();
                 }
+
+                return;
             }
         }
 
-        return 'OK';
+        if ('cli' === PHP_SAPI) {
+            return 'OK';
+        } else {
+            $response = new Response('OK', 200, array('content-type' => 'text/html'));
+            $response->send();
+        }
     }
 
     /**
