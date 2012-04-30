@@ -22,11 +22,13 @@ class Check
     const RESPONSE_STATUS = 'status';
 
     private $config = null;
+    private $isConsoleMode = false;
     private $responseType = null;
 
-    public function __construct($responseType = Check::RESPONSE_STATUS)
+    public function __construct($responseType = Check::RESPONSE_STATUS, $isConsoleMode = false)
     {
         $this->responseType = $responseType;
+        $this->isConsoleMode = $isConsoleMode;
     }
 
     /**
@@ -35,12 +37,10 @@ class Check
     public function execute()
     {
         if (!isset($this->config['service'])) {
-            throw new CheckException('Service not defined.');
+            throw new CheckException('Service is not defined.');
         }
 
-        if ($this->responseType == Check::RESPONSE_STATUS) {
-            return $this->executeStatus($this->config['service']);
-        }
+        return $this->executeStatus($this->config['service']);
     }
 
     private function executeStatus($services)
@@ -49,22 +49,20 @@ class Check
             $info = $this->checkService($key, $service);
             
             if (!$info->getStatus()) {
-                if ('cli' === PHP_SAPI) {
-                    throw new \Exception($info->getErrorMessage());
+                if ($this->isConsole()) {
+                    throw new CheckException($info->getErrorMessage());
                 } else {
                     $response = new Response($info->getErrorMessage(), 500, array('content-type' => 'text/html'));
-                    $response->send();
+                    return $response->send();
                 }
-
-                return;
             }
         }
 
-        if ('cli' === PHP_SAPI) {
+        if ($this->isConsole()) {
             return 'OK';
         } else {
             $response = new Response('OK', 200, array('content-type' => 'text/html'));
-            $response->send();
+            return $response->send();
         }
     }
 
@@ -127,4 +125,13 @@ class Check
         }
     }
 
+    /**
+     * Return is started in console mode
+     * 
+     * @return boolean true - console, false - other
+     */
+    private function isConsole()
+    {
+        return $this->isConsoleMode;
+    }
 }

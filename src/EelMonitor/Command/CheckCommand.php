@@ -37,7 +37,7 @@ EOT
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         try {
-            $check = new Check();
+            $check = new Check(Check::RESPONSE_STATUS, true);
             $check->setConfigPath($input->getOption('config-file'));
             $response = $check->execute();
             

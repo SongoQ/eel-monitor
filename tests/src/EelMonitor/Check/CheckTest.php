@@ -92,48 +92,112 @@ EOT
     public function testCheckServiceError()
     {
         $service = array('url' => 'http://google.com/', 'status' => 200);
-        $this->object->checkService('test', $service);
+        $check = new Check(Check::RESPONSE_STATUS, true);
+        $check->checkService('test', $service);
     }
     
     public function testCheckServiceOK()
     {
         $service = array('type' => 'url', 'url' => 'http://google.com/', 'status_code' => 200);
-        $this->object->checkService('test', $service);
+        $check = new Check(Check::RESPONSE_STATUS, true);
+        $check->checkService('test', $service);
     }
     
     /**
      * @expectedException           EelMonitor\Check\CheckException
-     * @expectedExceptionMessage    Service not defined.
+     * @expectedExceptionMessage    Service is not defined.
      */
-    public function testExecuteError()
+    public function testExecuteServiceIsNotDefined()
     {
-        $this->object->setConfigParams(<<<EOT
+        $check = new Check(Check::RESPONSE_STATUS, true);
+        $check->setConfigParams(<<<EOT
 test:
   
   example_1:
     type:         url
-    url:          http://google.com/
+    url:          http://eel-monitor.ampluso.com/
     status_code:  200
 
 EOT
         );
         
-        $this->object->execute();
+        $check->execute();
+    }
+    
+    /**
+     * @expectedException           EelMonitor\Check\CheckException
+     */
+    public function testExecuteConsoleError()
+    {
+        $check = new Check(Check::RESPONSE_STATUS, true);
+        $check->setConfigParams(<<<EOT
+service:
+  
+  example_1:
+    type:         url
+    url:          http://eel-monitor.ampluso.com/error
+    status_code:  200
+
+EOT
+        );
+        
+        $check->execute();
     }
     
     public function testExecuteOK()
     {
-        $this->object->setConfigParams(<<<EOT
+        $check = new Check(Check::RESPONSE_STATUS, false);
+        $check->setConfigParams(<<<EOT
 service:
   
   example_1:
     type:          url
-    url:           http://google.com/
+    url:           http://eel-monitor.ampluso.com/
     status_code:   200
 
 EOT
         );
         
-        $this->object->execute();
+        $response = $check->execute();
+        $this->assertEquals($response->getStatusCode(), 200);
+        $this->assertEquals($response->getContent(), 'OK');
     }
+    
+    public function testExecuteError()
+    {
+        $check = new Check(Check::RESPONSE_STATUS, false);
+        $check->setConfigParams(<<<EOT
+service:
+  
+  example_1:
+    type:          url
+    url:           http://eel-monitor.ampluso.com/error
+    status_code:   200
+
+EOT
+        );
+        
+        $response = $check->execute();
+        
+        $this->assertEquals($response->getStatusCode(), 500);
+        $this->assertEquals($response->getContent(), 'Service "http://eel-monitor.ampluso.com/error" response status code: 404');
+    }
+    
+    public function testExecuteConsoleOK()
+    {
+        $check = new Check(Check::RESPONSE_STATUS, true);
+        $check->setConfigParams(<<<EOT
+service:
+  
+  example_1:
+    type:          url
+    url:           http://eel-monitor.ampluso.com/
+    status_code:   200
+
+EOT
+        );
+        
+        $this->assertEquals($check->execute(), 'OK');
+    }
+    
 }
