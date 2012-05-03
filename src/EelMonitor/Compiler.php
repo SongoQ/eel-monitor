@@ -14,7 +14,10 @@ namespace EelMonitor;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Process\Process;
 
-class Compiler {
+class Compiler
+{
+
+    private $versionGit = null;
 
     /**
      * Compiles eel-monitor into a single phar file
@@ -22,15 +25,22 @@ class Compiler {
      * @throws \RuntimeException
      * @param string $pharFile The full path to the file to create
      */
-    public function compile($pharFile = 'eel-monitor.phar') {
-        
+    public function compile($pharFile = 'eel-monitor.phar')
+    {
+
         if (file_exists($pharFile)) {
             unlink($pharFile);
         }
 
+        $process = new Process('git log --pretty="%h" -n1 HEAD', __DIR__);
+        if ($process->run() != 0) {
+            throw new \RuntimeException('Can\'t run git log.');
+        }
+        $this->versionGit = trim($process->getOutput());
+
         $phar = new \Phar($pharFile, 0, 'eel-monitor.phar');
         $phar->setSignatureAlgorithm(\Phar::SHA1);
-        
+
         $phar->startBuffering();
 
         $finder = new Finder();
@@ -38,6 +48,7 @@ class Compiler {
                 ->ignoreVCS(true)
                 ->name('*.php')
                 ->notName('Compiler.php')
+                ->notName('EelMonitor.php')
                 ->in(__DIR__.'/..')
         ;
 
@@ -57,7 +68,8 @@ class Compiler {
             $this->addFile($phar, $file);
         }
 
-        $this->addBinFile($phar);
+        $this->addFilterFile($phar, new \SplFileInfo(__DIR__.'/../../bin/eel-monitor'));
+        $this->addFilterFile($phar, new \SplFileInfo(__DIR__.'/../../src/EelMonitor/EelMonitor.php'));
 
         // Stubs
         $phar->setStub($this->getStub());
@@ -65,23 +77,32 @@ class Compiler {
 
         $phar->stopBuffering();
         unset($phar);
+
+        chmod($pharFile, 0777);
     }
 
-    private function addFile(\Phar $phar, $file) {
+    private function addFile(\Phar $phar, $file)
+    {
 
         $path = str_replace(dirname(dirname(__DIR__)).DIRECTORY_SEPARATOR, '', $file->getRealPath());
         $phar->addFile($file, $path);
     }
 
-    private function addBinFile(\Phar $phar) {
+    private function addFilterFile(\Phar $phar, $file)
+    {
 
-        $content = file_get_contents(__DIR__.'/../../bin/eel-monitor');
+        $path = str_replace(dirname(dirname(__DIR__)).DIRECTORY_SEPARATOR, '', $file->getRealPath());
+        $content = file_get_contents($file);
+
         $content = preg_replace('{^#!/usr/bin/env php\s*}', '', $content);
-        $phar->addFromString('bin/eel-monitor', $content);
+        $content = preg_replace('@(VERSION = \'(.+?))\';@', '$1-'.$this->versionGit.'\';', $content);
+
+        $phar->addFromString($path, $content);
     }
 
-    private function getStub() {
-        
+    private function getStub()
+    {
+
         return <<<'EOF'
 #!/usr/bin/env php
 <?php

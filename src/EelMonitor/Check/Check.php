@@ -47,7 +47,7 @@ class Check
     {
         foreach ($services as $key => $service) {
             $info = $this->checkService($key, $service);
-            
+
             if (!$info->getStatus()) {
                 if ($this->isConsole()) {
                     throw new CheckException($info->getErrorMessage());
@@ -134,4 +134,5 @@ class Check
     {
         return $this->isConsoleMode;
     }
+
 }

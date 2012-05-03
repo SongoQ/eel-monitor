@@ -13,4 +13,5 @@ namespace EelMonitor\Check;
 
 class CheckException extends \RuntimeException
 {
+    
 }

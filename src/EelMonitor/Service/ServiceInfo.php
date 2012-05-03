@@ -23,7 +23,7 @@ class ServiceInfo
     {
         $this->timeStart = $value;
     }
-    
+
     public function getTimeStart()
     {
         return $this->timeStart;
@@ -33,7 +33,7 @@ class ServiceInfo
     {
         $this->timeStop = $value;
     }
-    
+
     public function getTimeStop()
     {
         return $this->timeStop;
@@ -43,17 +43,17 @@ class ServiceInfo
     {
         $this->type = $value;
     }
-    
+
     public function getType()
     {
         return $this->type;
     }
-    
+
     public function setStatus($value)
     {
         $this->status = $value;
     }
-    
+
     public function getStatus()
     {
         return $this->status;
@@ -63,9 +63,10 @@ class ServiceInfo
     {
         $this->errroMessage = $value;
     }
-    
+
     public function getErrorMessage()
     {
         return $this->errroMessage;
     }
+
 }

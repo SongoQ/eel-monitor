@@ -13,5 +13,6 @@ namespace EelMonitor\Service;
 
 interface ServiceInterface
 {
+
     public function execute();
 }

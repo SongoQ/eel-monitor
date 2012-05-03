@@ -15,22 +15,22 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-
 use EelMonitor\Check\Check;
 
 class CheckCommand extends Command
 {
+
     protected function configure()
     {
         $this
-            ->setName('check')
-            ->setDescription('Check services.')
-            ->addOption('config-file', null, InputOption::VALUE_OPTIONAL, 'config (eel-monitor.yml) path', 'eel-monitor.yml')
-            ->setHelp(<<<EOT
+                ->setName('check')
+                ->setDescription('Check services.')
+                ->addOption('config-file', null, InputOption::VALUE_OPTIONAL, 'config (eel-monitor.yml) path', 'eel-monitor.yml')
+                ->setHelp(<<<EOT
 <info>Eel-Monitor - Simple Web Server monitoring</info>
 
 EOT
-            )
+                )
         ;
     }
 
@@ -40,11 +40,12 @@ EOT
             $check = new Check(Check::RESPONSE_STATUS, true);
             $check->setConfigPath($input->getOption('config-file'));
             $response = $check->execute();
-            
-            $output->writeln('<info>'.$response.'</info>');            
+
+            $output->writeln('<info>'.$response.'</info>');
         } catch (Exception $e) {
-            
+
             $output->writeln('<error>'.$e->getMessage().'</error>');
         }
     }
+
 }

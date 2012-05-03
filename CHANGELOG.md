@@ -1,5 +1,7 @@
 1.0.0-dev
- * Add support url check
- * Add documentation
- * Add compile script
+ * Adding a task to update eel-monitor
+ * Adding version change during compilation
+ * Adding support url check
+ * Adding documentation
+ * Adding compile script
  * Initial release

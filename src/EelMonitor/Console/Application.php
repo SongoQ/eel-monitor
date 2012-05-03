@@ -15,16 +15,20 @@ use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use EelMonitor\Command;
+use EelMonitor\EelMonitor;
 
-class Application extends BaseApplication {
+class Application extends BaseApplication
+{
 
-    public function __construct() {
-        
-        parent::__construct('eel-monitor', '1.0.0-dev');
+    public function __construct()
+    {
+
+        parent::__construct('eel-monitor', EelMonitor::VERSION);
     }
 
-    public function doRun(InputInterface $input, OutputInterface $output) {
-        
+    public function doRun(InputInterface $input, OutputInterface $output)
+    {
+
         $this->registerCommands();
         return parent::doRun($input, $output);
     }
@@ -32,9 +36,11 @@ class Application extends BaseApplication {
     /**
      * Initializes all the Eel-Monitor commands
      */
-    protected function registerCommands() {
+    protected function registerCommands()
+    {
 
         $this->add(new Command\CheckCommand());
+        $this->add(new Command\UpdateCommand());
     }
 
 }

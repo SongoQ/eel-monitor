@@ -9,7 +9,8 @@
  * file that was distributed with this source code.
  */
 
-function includeIfExists($file) {
+function includeIfExists($file)
+{
     if (file_exists($file)) {
         return include $file;
     }
@@ -18,7 +19,7 @@ function includeIfExists($file) {
 if (!$loader = includeIfExists(__DIR__.'/../vendor/.composer/autoload.php')) {
     $nl = PHP_SAPI === 'cli' ? PHP_EOL : '<br />';
     echo "$nl$nl";
-    
+
     if (is_writable(dirname(__DIR__)) && $installer = @file_get_contents('http://getcomposer.org/installer')) {
         echo 'You must set up the project dependencies.'.$nl;
         $installerPath = dirname(__DIR__).'/install-composer.php';

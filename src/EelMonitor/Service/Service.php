@@ -16,9 +16,10 @@ use EelMonitor\Service\ServiceInterface;
 
 abstract class Service implements ServiceInterface
 {
-    protected 
-        $options = array(),
-        $serviceInfo = null;
+
+    protected
+            $options = array(),
+            $serviceInfo = null;
 
     public function __construct($options)
     {
@@ -26,17 +27,17 @@ abstract class Service implements ServiceInterface
         $this->options = $options;
         $this->serviceInfo->setType($this->options['type']);
     }
-    
+
     public function preExecute()
     {
         $this->serviceInfo->setTimeStart(microtime(true));
     }
-    
+
     public function postExecute()
     {
         $this->serviceInfo->setTimeStop(microtime(true));
     }
-    
+
     /**
      * @return EelMonitor\Service\ServiceInfo ServiceInfo object 
      */
@@ -44,4 +45,5 @@ abstract class Service implements ServiceInterface
     {
         return $this->serviceInfo;
     }
+
 }
