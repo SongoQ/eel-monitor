@@ -1,7 +1,8 @@
 vendor
+web
 phpunit.xml
 eel-monitor.phar
 eel-monitor.yml
-web
+composer.phar
+install-composer.php
 
-composer.lock
