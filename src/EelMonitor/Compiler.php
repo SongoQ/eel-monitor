@@ -36,49 +36,54 @@ class Compiler
         if ($process->run() != 0) {
             throw new \RuntimeException('Can\'t run git log.');
         }
+
         $this->versionGit = trim($process->getOutput());
 
-        $phar = new \Phar($pharFile, 0, 'eel-monitor.phar');
-        $phar->setSignatureAlgorithm(\Phar::SHA1);
+        try {
+            $phar = new \Phar($pharFile, 0, 'eel-monitor.phar');
+            $phar->setSignatureAlgorithm(\Phar::SHA1);
 
-        $phar->startBuffering();
+            $phar->startBuffering();
 
-        $finder = new Finder();
-        $finder->files()
-                ->ignoreVCS(true)
-                ->name('*.php')
-                ->notName('Compiler.php')
-                ->notName('EelMonitor.php')
-                ->in(__DIR__.'/..')
-        ;
+            $finder = new Finder();
+            $finder->files()
+                    ->ignoreVCS(true)
+                    ->name('*.php')
+                    ->notName('Compiler.php')
+                    ->notName('EelMonitor.php')
+                    ->in(__DIR__.'/..')
+            ;
 
-        foreach ($finder as $file) {
-            $this->addFile($phar, $file);
+            foreach ($finder as $file) {
+                $this->addFile($phar, $file);
+            }
+
+            $finder = new Finder();
+            $finder->files()
+                    ->ignoreVCS(true)
+                    ->name('*.php')
+                    ->exclude('Tests')
+                    ->in(__DIR__.'/../../vendor')
+            ;
+
+            foreach ($finder as $file) {
+                $this->addFile($phar, $file);
+            }
+
+            $this->addFilterFile($phar, new \SplFileInfo(__DIR__.'/../../bin/eel-monitor'));
+            $this->addFilterFile($phar, new \SplFileInfo(__DIR__.'/../../src/EelMonitor/EelMonitor.php'));
+
+            // Stubs
+            $phar->setStub($this->getStub());
+            $this->addFile($phar, new \SplFileInfo(__DIR__.'/../../LICENSE'));
+
+            $phar->stopBuffering();
+            unset($phar);
+
+            chmod($pharFile, 0777);
+        } catch (\UnexpectedValueException $e) {
+            echo $e->getMessage();
         }
-
-        $finder = new Finder();
-        $finder->files()
-                ->ignoreVCS(true)
-                ->name('*.php')
-                ->exclude('Tests')
-                ->in(__DIR__.'/../../vendor')
-        ;
-
-        foreach ($finder as $file) {
-            $this->addFile($phar, $file);
-        }
-
-        $this->addFilterFile($phar, new \SplFileInfo(__DIR__.'/../../bin/eel-monitor'));
-        $this->addFilterFile($phar, new \SplFileInfo(__DIR__.'/../../src/EelMonitor/EelMonitor.php'));
-
-        // Stubs
-        $phar->setStub($this->getStub());
-        $this->addFile($phar, new \SplFileInfo(__DIR__.'/../../LICENSE'));
-
-        $phar->stopBuffering();
-        unset($phar);
-
-        chmod($pharFile, 0777);
     }
 
     private function addFile(\Phar $phar, $file)
